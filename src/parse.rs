@@ -5,7 +5,7 @@ pub fn normalize_and_extract_codes(text: &str) -> Option<String> {
     //    Group 1: ([A-Z]+) -> The letters
     //    Optional Separator: -?
     //    Group 2: (\d+) -> The digits
-    let re = Regex::new(r"([A-Z]+)-?(\d+)").unwrap();
+    let re = Regex::new(r"([A-Z]+)-?(\d+)").unwrap(); // Safe to ignore unwrap() -> valid regex
 
     // 2. Define the replacement string using backreferences:
     //    $1: Content of Group 1
@@ -18,7 +18,7 @@ pub fn normalize_and_extract_codes(text: &str) -> Option<String> {
 
     let normalized_codes: Vec<String> = re
         .find_iter(text)
-        .filter_map(|m| {
+        .map(|m| {
             // Get the entire matched string (e.g., "ABC123" or "DEF-456")
             let matched_string = m.as_str();
 
@@ -28,14 +28,14 @@ pub fn normalize_and_extract_codes(text: &str) -> Option<String> {
             let normalized = re.replace(matched_string, replacement_template);
 
             // Convert Cow<str> to String for the final vector
-            Some(normalized.to_string())
+            normalized.to_string()
         })
         .collect();
 
     if normalized_codes.len() == 1 {
         Some(normalized_codes[0].clone())
     } else {
-        for i in normalized_codes {
+        if let Some(i) = normalized_codes.into_iter().next() {
             return match i.len() {
                 7 => Some(i.to_string()),
                 8 => Some(i.to_string()),
