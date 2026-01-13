@@ -35,12 +35,12 @@ pub fn normalize_and_extract_codes(text: &str) -> Option<String> {
     if normalized_codes.len() == 1 {
         Some(normalized_codes[0].clone())
     } else {
-        if let Some(i) = normalized_codes.into_iter().next() {
+        if let Some(i) = normalized_codes.clone().into_iter().next() {
             return match i.len() {
                 7 => Some(i.to_string()),
                 8 => Some(i.to_string()),
                 11 => Some(i.to_string()),
-                _ => None,
+                _ => Some(normalized_codes[1].clone()),
             };
         }
         None
